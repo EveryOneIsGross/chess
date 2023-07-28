@@ -1,4 +1,7 @@
 # chess
+
+![chessgpt](https://github.com/EveryOneIsGross/chess/assets/23621140/1280658e-4af1-41bf-93ba-c5d6f6106b98)
+
 play chess with openai, uses embeddings to rank possible moves based on history. Unlike traditional chess engines that rely on predefined heuristics and complex algorithms, ChessBOT uses a unique method to rank and select moves, making it a challenging and unpredictable opponent.
 
 Features
