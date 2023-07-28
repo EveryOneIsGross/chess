@@ -1,4 +1,4 @@
-# chess
+# chessGPT : A n00b chess player with the capacity to learn. 
 
 ![chessgpt](https://github.com/EveryOneIsGross/chess/assets/23621140/1280658e-4af1-41bf-93ba-c5d6f6106b98)
 
