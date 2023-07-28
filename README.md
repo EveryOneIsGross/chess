@@ -1,4 +1,5 @@
-# chessGPT : openai chess opponent.
+# chessGPT
+## a simple chessbot using OpenAI
 
 ![chessgpt](https://github.com/EveryOneIsGross/chess/assets/23621140/1280658e-4af1-41bf-93ba-c5d6f6106b98)
 
