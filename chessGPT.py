@@ -4,8 +4,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import openai
 import json
+import time
 import dotenv
 import os
+import pandas as pd
 
 dotenv.load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -39,8 +41,9 @@ def get_openai_score(instruction):
         \n4. The game can also end by resignation. If a player decides they cannot win, they can choose to resign, ending the game immediately. \
         \n5. The game is drawn if neither player can checkmate the other\'s king. This can occur under several conditions, including insufficient material to checkmate, stalemate, or threefold repetition of a position.'
     prompt = chess_rules + "\n\n" + instruction
-    response = openai.Completion.create(engine="text-davinci-003", prompt=prompt, max_tokens=100)
-    return response.choices[0].text.strip()
+    response = openai.Completion.create(engine="text-davinci-002", prompt=prompt, max_tokens=10)
+    score = response.choices[0].text.strip()
+    return score
 
 def get_best_move(move_scores):
     move_scores.sort(key=lambda x: x[1], reverse=True)
@@ -70,46 +73,77 @@ def get_user_move(board):
 def load_game_data():
     try:
         with open('game_data.json', 'r') as f:
-            return json.load(f)
+            return pd.read_json(f, lines=True)  # Specify `lines=True` to read JSON records as lines
     except FileNotFoundError:
-        return {
-            "responses": [],
-            "state_embeddings": [],
-            "move_embeddings": []
-        }
+        return pd.DataFrame(columns=['state_embeddings', 'move_embeddings', 'move_durations', 'board_positions', 'moved_pieces'])
+
+def save_game_data(game_data):
+    game_data.to_json('game_data.json', orient='records', lines=True)
 
 def play_game():
     model = SentenceTransformer('all-MiniLM-L6-v2')
     board = chess.Board()
     previous_state_embeddings = []
     previous_move_embeddings = []
+    move_durations = []
+    board_positions = []
+    moved_pieces = []
+    game_result = None  # variable to hold game result
+
+    # Load existing game data
+    game_data = load_game_data()
+
     while True:
         print_board(board)
         if board.is_checkmate():
             print("Checkmate!")
+            game_result = "Checkmate"
             break
         elif board.is_stalemate() or board.is_insufficient_material() or board.can_claim_draw():
             print("It's a draw!")
+            game_result = "Draw"
             break
         elif board.turn:
+            move_start_time = time.time()  # Record move start time
             move = get_user_move(board)
             if move is None:  # user resigns
+                game_result = "Resign"
                 break
+            move_durations.append(time.time() - move_start_time)  # Record move duration
         else:
+            move_start_time = time.time()  # Record move start time
             move = get_openai_move(board, previous_state_embeddings, previous_move_embeddings, model)
+            move_durations.append(time.time() - move_start_time)  # Record move duration
+
         board.push_uci(move)
         state_string = str(board)
         move_string = move
         state_embedding = model.encode([state_string])[0]
         move_embedding = model.encode([move_string])[0]
-        game_data["state_embeddings"].append(state_embedding.tolist())
-        game_data["move_embeddings"].append(move_embedding.tolist())
-        with open('game_data.json', 'w') as f:
-            json.dump(game_data, f)
+        board_positions.append(state_string)  # Record board position
+
+        # Record if any piece has moved from its starting position
+        moved_piece = board.piece_at(chess.parse_square(move[2:4]))
+        moved_pieces.append(moved_piece.symbol() if moved_piece else None)
+
         previous_state_embeddings.append(state_embedding)
         previous_move_embeddings.append(move_embedding)
 
-if __name__ == "__main__":
+    # Save the new game data and append it to the existing DataFrame
+    new_game_data = pd.DataFrame({
+        "state_embeddings": previous_state_embeddings,
+        "move_embeddings": previous_move_embeddings,
+        "move_durations": move_durations,
+        "board_positions": board_positions,
+        "moved_pieces": moved_pieces,
+        "game_result": game_result  # add game_result
+    })
 
-    game_data = load_game_data()  # Load existing data from "game_data.json" or initialize empty data
+    if not new_game_data.empty:  # Check if the new_game_data DataFrame is not empty
+        game_data = pd.concat([game_data, new_game_data], ignore_index=True)
+
+    # Save the updated game data
+    save_game_data(game_data)
+
+if __name__ == "__main__":
     play_game()
