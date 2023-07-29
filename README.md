@@ -1,7 +1,7 @@
 # chessGPT
 ## a simple chessbot using OpenAI
 
-![chessgpt](https://github.com/EveryOneIsGross/chess/assets/23621140/1280658e-4af1-41bf-93ba-c5d6f6106b98)
+![chessgpt](https://github.com/EveryOneIsGross/chess/assets/23621140/0c7dbc12-dfa4-47db-b640-7234c2167fe3)
 
 I didn't have anyone to play chess with so I made openai play me. Uses embeddings to rank possible moves based on history. Unlike traditional chess engines that rely on predefined heuristics and complex algorithms, ChessBOT uses a unique method to rank and select moves, making it really bad at chess, but maybe it'll get good?
 
