@@ -1,5 +1,5 @@
 # chessGPT
-## a simple chessbot using OpenAI
+## a chessbot using OpenAI
 
 ![chessgpt](https://github.com/EveryOneIsGross/chess/assets/23621140/0c7dbc12-dfa4-47db-b640-7234c2167fe3)
 
