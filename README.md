@@ -9,8 +9,11 @@ I didn't have anyone to play chess with so I made openai play me. Uses embedding
 
 Features:
 
+**Import Chess:**
+Uses 'import chess' as the gamespace.
+
 **OpenAI Integration:**
-ChessBOT uses OpenAI API
+ChessBOT uses OpenAI API for choosing move.
 
 **Sentence Transformers:**
 ChessBOT uses Sentence Transformers to convert the state of the chess board and moves into embeddings, which are then used to calculate cosine similarities.
