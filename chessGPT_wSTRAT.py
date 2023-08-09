@@ -1,3 +1,6 @@
+'''
+Currently the strategy mechanic is broken, just an issue converting to embeddings and back, cause chasing arrays is so fun.
+'''
 import numpy as np
 import chess
 from sklearn.metrics.pairwise import cosine_similarity
